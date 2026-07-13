@@ -7,6 +7,19 @@ import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+    server: {
+        watch: {
+            ignored: [
+                '**/.agents/**',
+                '**/.codex/**',
+                '**/storage/**',
+                '**/*.sqlite',
+                '**/*-journal',
+                '**/footpoint',
+                '**/footpoint-journal',
+            ],
+        },
+    },
     plugins: [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
@@ -17,7 +30,9 @@ export default defineConfig({
                 }),
             ],
         }),
-        inertia(),
+        inertia({
+            ssr: false,
+        }),
         react({
             babel: {
                 plugins: ['babel-plugin-react-compiler'],

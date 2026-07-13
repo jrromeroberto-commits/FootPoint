@@ -16,6 +16,7 @@ import {
     Utensils,
 } from 'lucide-react';
 import { lazy, Suspense, useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 
 import { dashboard, login } from '@/routes';
 import type { User } from '@/types';
@@ -33,43 +34,51 @@ type WelcomePageProps = {
 const categories = [
     {
         name: 'Criolla',
-        image: '/images/foodpoint/categories/criolla.jpg',
+        image: '/images/foodpoint/categories/comida_criolla.png',
         icon: Soup,
+        searchTerm: 'criolla',
     },
     {
         name: 'Sushi',
-        image: '/images/foodpoint/categories/sushi.jpg',
+        image: '/images/foodpoint/categories/sushi.png',
         icon: Utensils,
+        searchTerm: 'sushi',
     },
     {
         name: 'Pollerias',
-        image: '/images/foodpoint/categories/pollerias.jpg',
+        image: '/images/foodpoint/categories/polleria.png',
         icon: Drumstick,
+        searchTerm: 'pollo',
     },
     {
         name: 'Hamburguesas',
-        image: '/images/foodpoint/categories/hamburguesas.jpg',
+        image: '/images/foodpoint/categories/hamburguesa.png',
         icon: Sandwich,
+        searchTerm: 'hamburguesa',
     },
     {
         name: 'Pastas',
-        image: '/images/foodpoint/categories/pastas.jpg',
+        image: '/images/foodpoint/categories/pastas.png',
         icon: Utensils,
+        searchTerm: 'pastas',
     },
     {
         name: 'Cafeterias',
-        image: '/images/foodpoint/categories/cafeterias.jpg',
+        image: '/images/foodpoint/categories/cafeteria.png',
         icon: Coffee,
+        searchTerm: 'cafe',
     },
     {
         name: 'Postres',
-        image: '/images/foodpoint/categories/postres.jpg',
+        image: '/images/foodpoint/categories/postres.png',
         icon: CakeSlice,
+        searchTerm: 'postres',
     },
     {
         name: 'Saludable',
-        image: '/images/foodpoint/categories/saludable.jpg',
+        image: '/images/foodpoint/categories/comida_saludable.png',
         icon: Salad,
+        searchTerm: 'saludable',
     },
 ];
 
@@ -130,6 +139,8 @@ function MapFallback() {
 export default function Welcome() {
     const { auth } = usePage<WelcomePageProps>().props;
     const [isBrowserReady, setIsBrowserReady] = useState(false);
+    const [foodQuery, setFoodQuery] = useState('');
+    const [locationQuery, setLocationQuery] = useState('');
 
     useEffect(() => {
         const animationFrame = window.requestAnimationFrame(() => {
@@ -139,12 +150,16 @@ export default function Welcome() {
         return () => window.cancelAnimationFrame(animationFrame);
     }, []);
 
+    function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+    }
+
     return (
         <>
             <Head title="FoodPoint" />
 
             <div className="min-h-screen bg-white text-neutral-950">
-                <header className="sticky top-0 z-50 border-b border-neutral-100 bg-white/95 shadow-sm backdrop-blur">
+                <header className="sticky top-0 z-[1000] border-b border-neutral-100 bg-white shadow-sm">
                     <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
                         <FoodPointLogo />
 
@@ -183,12 +198,12 @@ export default function Welcome() {
                     <section className="relative grid min-h-[calc(100vh-80px)] overflow-hidden lg:grid-cols-[1.08fr_0.92fr]">
                         <div className="relative z-10 flex flex-col justify-center px-5 py-12 lg:px-8 lg:pr-10 xl:pl-[max(2rem,calc((100vw-1280px)/2))]">
                             <div className="max-w-3xl">
-                                <h1 className="[font-family:Georgia,serif] text-5xl leading-[1.08] font-black tracking-normal text-neutral-950 sm:text-6xl xl:text-7xl">
-                                    ENCUENTRA EL{' '}
-                                    <span className="text-orange-600">
+                                <h1 className="[font-family:Georgia,serif] text-5xl leading-[1.08] font-black tracking-normal text-neutral-950 sm:text-6xl xl:text-[4.45rem]">
+                                    <span className="block">ENCUENTRA EL</span>
+                                    <span className="block text-orange-600">
                                         RESTAURANTE IDEAL
-                                    </span>{' '}
-                                    CERCA DE TI
+                                    </span>
+                                    <span className="block">CERCA DE TI</span>
                                 </h1>
 
                                 <p className="mt-6 max-w-2xl text-lg leading-7 text-neutral-700">
@@ -199,42 +214,64 @@ export default function Welcome() {
                                 </p>
                             </div>
 
-                            <div className="relative mt-8 w-full max-w-3xl rounded-2xl bg-white p-4 shadow-2xl shadow-neutral-900/20">
+                            <form
+                                className="relative mt-8 w-full max-w-3xl rounded-2xl bg-white p-4 shadow-2xl shadow-neutral-900/20"
+                                onSubmit={handleSearchSubmit}
+                            >
                                 <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] xl:items-center">
                                     <label className="flex items-center gap-4 border-neutral-200 md:border-r md:pr-4">
                                         <Search className="size-7 shrink-0 text-orange-600" />
-                                        <span>
+                                        <span className="min-w-0 flex-1">
                                             <span className="block text-base font-medium text-neutral-950">
                                                 Que deseas comer hoy?
                                             </span>
-                                            <span className="text-sm text-neutral-400">
-                                                Ej. sushi, pollo a la brasa,
-                                                pizza
-                                            </span>
+                                            <input
+                                                aria-label="Buscar por plato"
+                                                className="mt-1 w-full border-0 bg-transparent p-0 text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
+                                                name="food"
+                                                placeholder="Ej. sushi, pollo a la brasa, pizza"
+                                                type="search"
+                                                value={foodQuery}
+                                                onChange={(event) =>
+                                                    setFoodQuery(
+                                                        event.target.value,
+                                                    )
+                                                }
+                                            />
                                         </span>
                                     </label>
 
                                     <label className="flex items-center gap-4">
                                         <MapPin className="size-7 shrink-0 text-emerald-500" />
-                                        <span>
+                                        <span className="min-w-0 flex-1">
                                             <span className="block text-base font-medium text-neutral-950">
                                                 Distrito o ubicacion
                                             </span>
-                                            <span className="text-sm text-neutral-400">
-                                                Ej. Miraflores, San Isidro
-                                            </span>
+                                            <input
+                                                aria-label="Buscar por distrito o ubicacion"
+                                                className="mt-1 w-full border-0 bg-transparent p-0 text-sm text-neutral-700 outline-none placeholder:text-neutral-400"
+                                                name="location"
+                                                placeholder="Ej. Miraflores, San Isidro"
+                                                type="search"
+                                                value={locationQuery}
+                                                onChange={(event) =>
+                                                    setLocationQuery(
+                                                        event.target.value,
+                                                    )
+                                                }
+                                            />
                                         </span>
                                     </label>
 
-                                    <a
+                                    <button
                                         className="inline-flex h-14 items-center justify-center gap-2 rounded-xl bg-orange-600 px-6 font-black text-white shadow-lg shadow-orange-200 transition hover:bg-orange-700 xl:h-16"
-                                        href="#mapa"
+                                        type="submit"
                                     >
                                         <Search className="size-5" />
                                         BUSCAR
-                                    </a>
+                                    </button>
                                 </div>
-                            </div>
+                            </form>
 
                             <div className="mt-8 flex flex-wrap gap-3 text-xs font-black">
                                 <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-3 shadow-xl shadow-neutral-900/10">
@@ -262,7 +299,12 @@ export default function Welcome() {
                         >
                             {isBrowserReady ? (
                                 <Suspense fallback={<MapFallback />}>
-                                    <InteractiveMap />
+                                    <InteractiveMap
+                                        filters={{
+                                            food: foodQuery,
+                                            location: locationQuery,
+                                        }}
+                                    />
                                 </Suspense>
                             ) : (
                                 <MapFallback />
@@ -294,6 +336,11 @@ export default function Welcome() {
                                         <button
                                             className="group overflow-hidden rounded-lg bg-white text-left shadow-xl ring-1 shadow-neutral-900/15 ring-neutral-100 transition hover:-translate-y-1 hover:shadow-2xl"
                                             key={category.name}
+                                            onClick={() =>
+                                                setFoodQuery(
+                                                    category.searchTerm,
+                                                )
+                                            }
                                             type="button"
                                         >
                                             <div className="h-32 overflow-hidden">
