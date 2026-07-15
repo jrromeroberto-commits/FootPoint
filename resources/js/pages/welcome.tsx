@@ -18,6 +18,10 @@ import {
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 
+import type {
+    MapSearchFilters,
+    Restaurant,
+} from '@/components/foodpoint/interactive-map';
 import { dashboard, login } from '@/routes';
 import type { User } from '@/types';
 
@@ -29,6 +33,7 @@ type WelcomePageProps = {
     auth: {
         user: User | null;
     };
+    restaurants: Restaurant[];
 };
 
 const categories = [
@@ -137,7 +142,7 @@ function MapFallback() {
 }
 
 export default function Welcome() {
-    const { auth } = usePage<WelcomePageProps>().props;
+    const { auth, restaurants } = usePage<WelcomePageProps>().props;
     const [isBrowserReady, setIsBrowserReady] = useState(false);
     const [foodQuery, setFoodQuery] = useState('');
     const [locationQuery, setLocationQuery] = useState('');
@@ -303,7 +308,8 @@ export default function Welcome() {
                                         filters={{
                                             food: foodQuery,
                                             location: locationQuery,
-                                        }}
+                                        } satisfies MapSearchFilters}
+                                        restaurants={restaurants}
                                     />
                                 </Suspense>
                             ) : (
